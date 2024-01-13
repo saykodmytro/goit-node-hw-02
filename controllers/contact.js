@@ -1,5 +1,5 @@
-const Contact = require("../models/contact");
-const { ctrlWrapper } = require("../utils/index");
+const { Contact } = require("../models/contact");
+const { ctrlWrapper, HttpError } = require("../utils/index");
 
 const listContacts = async (req, res, next) => {
   const contacts = await Contact.find();
@@ -11,7 +11,7 @@ const getContactById = async (req, res, next) => {
 
   const contact = await Contact.findById(id);
   if (contact === null) {
-    return res.status(404).send("Contact not found");
+    throw HttpError(404, "Contact Not Found");
   }
   res.send(contact);
 };
@@ -32,7 +32,7 @@ const removeContact = async (req, res, next) => {
 
   const contact = await Contact.findByIdAndDelete(id);
   if (contact === null) {
-    return res.status(404).send("Contact not found");
+    throw HttpError(404, "Contact Not Found");
   }
   res.send(contact);
 };
@@ -48,7 +48,7 @@ const updateContact = async (req, res, next) => {
   const result = await Contact.findByIdAndUpdate(id, contact, { new: true });
 
   if (result === null) {
-    return res.status(404).send("Contact not found");
+    throw HttpError(404, "Contact Not Found");
   }
 
   res.send(result);
@@ -66,7 +66,7 @@ const changeContactFavorite = async (req, res, next) => {
   );
 
   if (result === null) {
-    return res.status(404).send("Contact not found");
+    throw HttpError(404, "Contact Not Found");
   }
 
   res.send(result);
