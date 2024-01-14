@@ -21,7 +21,7 @@ const validateBodyFavorite = (schema) => {
     }
     const { error } = schema.validate(req.body, { abortEarly: false });
     if (error) {
-      return res.status(400).json({ message: error.message });
+      return res.status(404).json({ message: error.message });
     }
     next();
   };

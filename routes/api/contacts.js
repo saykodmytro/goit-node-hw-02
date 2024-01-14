@@ -13,24 +13,27 @@ const {
 const {
   validateBody,
   validateBodyFavorite,
-} = require("../../middlewares/validateBody");
+  isValidId,
+} = require("../../middlewares/index");
 
 router.get("/", ContactController.listContacts);
 
-router.get("/:id", ContactController.getContactById);
+router.get("/:id", isValidId, ContactController.getContactById);
 
 router.post("/", validateBody(contactAddSchema), ContactController.addContact);
 
-router.delete("/:id", ContactController.removeContact);
+router.delete("/:id", isValidId, ContactController.removeContact);
 
 router.put(
   "/:id",
+  isValidId,
   validateBody(contactUpdateSchema),
   ContactController.updateContact
 );
 
 router.patch(
   "/:id/favorite",
+  isValidId,
   validateBodyFavorite(contactChangeSchema),
   ContactController.changeContactFavorite
 );
