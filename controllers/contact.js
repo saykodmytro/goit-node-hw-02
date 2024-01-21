@@ -2,17 +2,28 @@ const { Contact } = require("../models/contact");
 const { ctrlWrapper, HttpError } = require("../utils/index");
 
 const listContacts = async (req, res, next) => {
+  const userId = req.user.id;
+  console.log("userId: ", userId);
+
   const contacts = await Contact.find();
   res.send(contacts);
 };
 
+// { ownerId: userId }
+
 const getContactById = async (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
   const contact = await Contact.findById(id);
   if (contact === null) {
     throw HttpError(404, "Contact Not Found");
   }
+
+  if (contact.ownerId.toString() !== userId) {
+    return res.status(403).send("Forbidden");
+  }
+
   res.send(contact);
 };
 
