@@ -3,9 +3,7 @@ const { ctrlWrapper, HttpError } = require("../utils/index");
 
 const listContacts = async (req, res, next) => {
   const userId = req.user.id;
-  console.log("userId: ", userId);
-
-  const contacts = await Contact.find();
+  const contacts = await Contact.find({ ownerId: userId });
   res.send(contacts);
 };
 
