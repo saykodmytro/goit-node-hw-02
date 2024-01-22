@@ -17,8 +17,14 @@ const getContactById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
-  const { _id: ownerId } = req.user;
-  const contact = { ...req.body, ownerId };
+  console.log("req.user: ", req.user);
+
+  const contact = {
+    name: req.body.name,
+    email: req.body.email,
+    phone: req.body.phone,
+    ownerId: req.user._id,
+  };
 
   const result = await Contact.create(contact);
   res.status(201).send(result);
