@@ -2,7 +2,9 @@ const { Contact } = require("../models/contact");
 const { ctrlWrapper, HttpError } = require("../utils/index");
 
 const listContacts = async (req, res, next) => {
-  const contacts = await Contact.find();
+  const userId = req.user.id;
+  console.log("userId: ", userId);
+  const contacts = await Contact.find({ ownerId: userId });
   res.send(contacts);
 };
 
