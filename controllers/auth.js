@@ -40,6 +40,8 @@ async function login(req, res, next) {
       expiresIn: "1h",
     });
 
+    await User.findByIdAndUpdate(user._id, { token });
+
     res.send({
       token,
       user: {
@@ -50,4 +52,13 @@ async function login(req, res, next) {
   } catch (error) {}
 }
 
-module.exports = { register, login };
+async function logOut(req, res, next) {
+  try {
+    await User.findByIdAndUpdate(req.user._id, { token: "" });
+    res.status(204).send("No Content");
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { register, login, logOut };

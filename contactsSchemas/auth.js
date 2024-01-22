@@ -5,6 +5,7 @@ const userRegisterSchema = Joi.object({
   password: Joi.string().required(),
   subscription: Joi.string(),
 });
+
 const userLoginSchema = Joi.object({
   email: Joi.string().required(),
   password: Joi.string().required(),
