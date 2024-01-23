@@ -56,19 +56,9 @@ async function logout(req, res, next) {
   }
 }
 
-async function current(req, res) {
-  try {
-    const currentUser = await User.findById(req.user.id);
-    if (!currentUser) {
-      return res.status(404).json({ message: "Contact Not Found" });
-    }
-    res.status(200).json({
-      email: currentUser.email,
-      subscription: currentUser.subscription,
-    });
-  } catch (error) {
-    next(error);
-  }
+function current(req, res) {
+  const { email, subscription } = req.user;
+  res.status(200).json({ email, subscription });
 }
 
 module.exports = { register, login, logout, current };

@@ -29,9 +29,7 @@ function auth(req, res, next) {
         return res.status(401).send({ message: "Not authorized" });
       }
 
-      req.user = {
-        id: decode.id,
-      };
+      req.user = user;
       next();
     });
   } catch (error) {}
