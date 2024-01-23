@@ -3,7 +3,6 @@ const { ctrlWrapper, HttpError } = require("../utils/index");
 
 const listContacts = async (req, res, next) => {
   const userId = req.user.id;
-  console.log("userId: ", userId);
   const contacts = await Contact.find({ ownerId: userId });
   res.send(contacts);
 };
@@ -16,10 +15,8 @@ const getContactById = async (req, res, next) => {
     throw HttpError(404, "Contact Not Found");
   }
 
-  if (contact.ownerId !== userId) {
-    console.log("userId: ", userId);
-    console.log("ownerId: ", { ownerId: contact.ownerId });
-    throw HttpError(403, "Forbiten");
+  if (contact.ownerId.toString() !== userId) {
+    throw HttpError(404, "Contact Not Found");
   }
   res.send(contact);
 };
@@ -29,6 +26,7 @@ const addContact = async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
     phone: req.body.phone,
+    ownerId: req.userId,
   };
 
   const result = await Contact.create(contact);
