@@ -3,8 +3,7 @@ const { ctrlWrapper, HttpError } = require("../utils/index");
 
 const listContacts = async (req, res, next) => {
   const userId = req.user.id;
-  console.log("userId: ", userId);
-  const contacts = await Contact.find();
+  const contacts = await Contact.find({ ownerId: userId });
   res.send(contacts);
 };
 
@@ -23,8 +22,6 @@ const getContactById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
-  const userId = req.user.id;
-  console.log("userId: ", userId);
   const contact = {
     name: req.body.name,
     email: req.body.email,
@@ -48,13 +45,11 @@ const removeContact = async (req, res, next) => {
 
 const updateContact = async (req, res, next) => {
   const { id } = req.params;
-  const contact = {
-    name: req.body.name,
-    email: req.body.email,
-    phone: req.body.phone,
-  };
+  const contactData = req.body;
 
-  const result = await Contact.findByIdAndUpdate(id, contact, { new: true });
+  const result = await Contact.findByIdAndUpdate(id, contactData, {
+    new: true,
+  });
 
   if (result === null) {
     throw HttpError(404, "Contact Not Found");

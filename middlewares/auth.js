@@ -3,7 +3,6 @@ const User = require("../models/user");
 
 function auth(req, res, next) {
   const authHeader = req.headers.authorization;
-  console.log("authHeader: ", authHeader);
 
   if (typeof authHeader === "undefined") {
     return res.status(401).send({ message: "Not authorized" });
@@ -16,7 +15,6 @@ function auth(req, res, next) {
 
   try {
     jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
-      console.log("decode: ", decode);
       if (err) {
         return res.status(401).send({ message: "Not authorized" });
       }
@@ -34,7 +32,6 @@ function auth(req, res, next) {
       req.user = {
         id: decode.id,
       };
-      console.log("req.user: ", req.user);
       next();
     });
   } catch (error) {}

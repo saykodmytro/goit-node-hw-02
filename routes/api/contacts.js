@@ -22,6 +22,12 @@ router.get("/:id", isValidId, ContactController.getContactById);
 
 router.post("/", validateBody(contactAddSchema), ContactController.addContact);
 
+router.post(
+  "/:id",
+  validateBody(contactAddSchema),
+  ContactController.updateContact
+);
+
 router.delete("/:id", isValidId, ContactController.removeContact);
 
 router.put(
