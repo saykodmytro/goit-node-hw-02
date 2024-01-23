@@ -22,6 +22,8 @@ const getContactById = async (req, res, next) => {
 };
 
 const addContact = async (req, res, next) => {
+  const userId = req.user.id;
+  console.log("userId: ", userId);
   const contact = {
     name: req.body.name,
     email: req.body.email,
