@@ -10,10 +10,16 @@ const listContacts = async (req, res, next) => {
 
 const getContactById = async (req, res, next) => {
   const { id } = req.params;
-
+  const userId = req.user.id;
   const contact = await Contact.findById(id);
   if (contact === null) {
     throw HttpError(404, "Contact Not Found");
+  }
+
+  if (contact.ownerId !== userId) {
+    console.log("userId: ", userId);
+    console.log("ownerId: ", { ownerId: contact.ownerId });
+    throw HttpError(403, "Forbiten");
   }
   res.send(contact);
 };
