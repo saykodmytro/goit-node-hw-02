@@ -67,4 +67,8 @@ function current(req, res) {
   res.status(200).json({ email, subscription });
 }
 
-module.exports = { register, login, logout, current };
+function uploadAvatar(req, res) {
+  res.send("Avatar");
+}
+
+module.exports = { register, login, logout, current, uploadAvatar };

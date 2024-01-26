@@ -29,4 +29,6 @@ router.get("/current", AuthMiddleware, AuthController.current);
 
 router.post("/logout", AuthMiddleware, AuthController.logout);
 
+router.patch("/avatar", AuthMiddleware, AuthController.uploadAvatar);
+
 module.exports = router;
