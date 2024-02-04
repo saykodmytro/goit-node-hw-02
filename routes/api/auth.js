@@ -2,6 +2,7 @@ const express = require("express");
 
 const AuthController = require("../../controllers/auth");
 const AuthMiddleware = require("../../middlewares/auth");
+const uploadMiddleware = require("../../middlewares/upload");
 
 const router = express.Router();
 const jsonParser = express.json();
@@ -29,6 +30,11 @@ router.get("/current", AuthMiddleware, AuthController.current);
 
 router.post("/logout", AuthMiddleware, AuthController.logout);
 
-router.patch("/avatar", AuthMiddleware, AuthController.uploadAvatar);
+router.patch(
+  "/avatar",
+  uploadMiddleware.single("avatar"),
+  AuthMiddleware,
+  AuthController.uploadAvatar
+);
 
 module.exports = router;
