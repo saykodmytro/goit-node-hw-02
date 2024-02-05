@@ -37,6 +37,6 @@ router.patch(
   AuthController.uploadAvatar
 );
 
-router.get("/avatar", AuthController.getAvatar);
+router.get("/avatar", AuthMiddleware, AuthController.getAvatar);
 
 module.exports = router;

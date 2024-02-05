@@ -13,8 +13,8 @@ function auth(req, res, next) {
     return res.status(401).send({ message: "Not authorized" });
   }
 
-  try {
-    jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
+    try {
       if (err) {
         return res.status(401).send({ message: "Not authorized" });
       }
@@ -29,10 +29,12 @@ function auth(req, res, next) {
         return res.status(401).send({ message: "Not authorized" });
       }
 
-      req.user = user;
+      req.user = user; // Встановлюємо user як req.user
       next();
-    });
-  } catch (error) {}
+    } catch (error) {
+      next(error);
+    }
+  });
 }
 
 module.exports = auth;

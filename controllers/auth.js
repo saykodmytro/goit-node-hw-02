@@ -94,20 +94,24 @@ async function uploadAvatar(req, res, next) {
 }
 
 async function getAvatar(req, res, next) {
-  // res.send("get avatar");
   try {
-    const user = await User.findById(req.user.id);
+    // Отримати інформацію про поточного користувача з об'єкта req.user
+    const user = req.user;
     console.log("user: ", user);
+
     if (user === null) {
       return res.status(404).send({ message: "User not found" });
     }
-    if (user.avatar === null) {
+
+    // Перевірити, чи користувач має аватар
+    if (!user.avatar) {
       return res.status(404).send({ message: "Avatar not found" });
     }
+
+    // Відправити аватар як файл
     res.sendFile(path.join(__dirname, "..", "public/avatars", user.avatar));
   } catch (error) {
     next(error);
   }
 }
-
 module.exports = { register, login, logout, current, uploadAvatar, getAvatar };
