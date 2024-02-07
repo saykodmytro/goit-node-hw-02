@@ -29,7 +29,7 @@ function auth(req, res, next) {
         return res.status(401).send({ message: "Not authorized" });
       }
 
-      req.user = user; // Встановлюємо user як req.user
+      req.user = user;
       next();
     } catch (error) {
       next(error);

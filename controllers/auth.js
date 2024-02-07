@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("node:fs/promises");
 const path = require("node:path");
-const { func } = require("joi");
 
 async function register(req, res, next) {
   const { email, password } = req.body;
@@ -95,20 +94,16 @@ async function uploadAvatar(req, res, next) {
 
 async function getAvatar(req, res, next) {
   try {
-    // Отримати інформацію про поточного користувача з об'єкта req.user
-    const user = req.user;
-    console.log("user: ", user);
+    const user = await User.findById(req.user.id);
 
     if (user === null) {
       return res.status(404).send({ message: "User not found" });
     }
 
-    // Перевірити, чи користувач має аватар
-    if (!user.avatar) {
+    if (user.avatar === null) {
       return res.status(404).send({ message: "Avatar not found" });
     }
 
-    // Відправити аватар як файл
     res.sendFile(path.join(__dirname, "..", "public/avatars", user.avatar));
   } catch (error) {
     next(error);
