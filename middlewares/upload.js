@@ -1,14 +1,17 @@
 const multer = require("multer");
+const path = require("path");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    console.log("file: ", file);
-    cb(null);
+const tempDir = path.join(__dirname, "../", "temp");
+
+const multerConfig = multer.diskStorage({
+  destination: tempDir,
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
   },
-  //   filename: function (req, file, cb) {
-  //     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-  //     cb(null, file.fieldname + "-" + uniqueSuffix);
-  //   },
 });
 
-module.exports = multer({ storage });
+const upload = multer({
+  storage: multerConfig,
+});
+
+module.exports = upload;

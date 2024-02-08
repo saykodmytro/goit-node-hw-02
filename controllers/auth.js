@@ -1,6 +1,12 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const jimp = require("../utils/jimp");
+
+const avatarsDir = path.resolve("public/avatars");
 
 async function register(req, res, next) {
   const { email, password } = req.body;
@@ -11,7 +17,12 @@ async function register(req, res, next) {
       return res.status(409).send({ message: "Email in use" });
     }
     const passHash = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ ...req.body, password: passHash });
+    const avatarURL = gravatar.url(email);
+    const newUser = await User.create({
+      ...req.body,
+      password: passHash,
+      avatarURL,
+    });
 
     res
       .status(201)
@@ -67,24 +78,21 @@ function current(req, res) {
   res.status(200).json({ email, subscription });
 }
 
-async function uploadAvatar(req, res, next) {
-  // try {
-  //   await fs.rename(
-  //     req.file.path,
-  //     path.join(__dirname, "..", "public/avatars", req.file.filename)
-  //   );
-  //   const user = await User.findByIdAndUpdate(
-  //     req.user.id,
-  //     { avatar: req.file.filename },
-  //     { new: true }
-  //   );
-  //   if (user === null) {
-  //     return res.status(404).send({ message: "User not found" });
-  //   }
-  //   res.send(user);
-  // } catch (error) {
-  //   next(error);
-  // }
-}
+const updateAvatar = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+    const { path: tempUpload, originalname } = req.file;
+    await jimp(tempUpload);
+    const fileName = `${_id}${originalname}`;
+    const resultUpload = path.join(avatarsDir, fileName);
+    await fs.rename(tempUpload, resultUpload);
+    const avatarURL = path.join("avatars", fileName);
+    await User.findByIdAndUpdate(_id, { avatarURL });
 
-module.exports = { register, login, logout, current, uploadAvatar };
+    res.json({ avatarURL });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login, logout, current, updateAvatar };
