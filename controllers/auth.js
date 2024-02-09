@@ -5,6 +5,7 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 const jimp = require("../utils/jimp");
+const { HttpError } = require("../utils/index");
 
 const avatarsDir = path.resolve("public/avatars");
 
@@ -81,6 +82,8 @@ function current(req, res) {
 const updateAvatar = async (req, res, next) => {
   try {
     const { _id } = req.user;
+    if (req.file === undefined)
+      throw HttpError(404, "Image was not found, check form-data values");
     const { path: tempUpload, originalname } = req.file;
     await jimp(tempUpload);
     const fileName = `${_id}${originalname}`;

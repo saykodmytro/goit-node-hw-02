@@ -32,7 +32,7 @@ router.get("/current", AuthMiddleware, AuthController.current);
 router.post("/logout", AuthMiddleware, AuthController.logout);
 
 router.patch(
-  "/avatar",
+  "/avatars",
   AuthMiddleware,
   uploadMiddleware.single("avatar"),
   AuthController.updateAvatar
