@@ -5,7 +5,9 @@ const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
 const jimp = require("../utils/jimp");
-const { HttpError } = require("../utils/index");
+const { HttpError, sendEmail } = require("../utils/index");
+const crypto = require("node:crypto");
+const { BASE_URL } = process.env;
 
 const avatarsDir = path.resolve("public/avatars");
 
@@ -19,11 +21,22 @@ async function register(req, res, next) {
     }
     const passHash = await bcrypt.hash(password, 10);
     const avatarURL = gravatar.url(email);
+    const verifyToken = crypto.randomUUID();
+
     const newUser = await User.create({
       ...req.body,
       password: passHash,
       avatarURL,
+      verifyToken,
     });
+
+    const verifyEmail = {
+      to: email,
+      subject: "Verify email",
+      html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verifyToken}">Click verify email</a>`,
+    };
+
+    await sendEmail(verifyEmail);
 
     res
       .status(201)
@@ -98,4 +111,11 @@ const updateAvatar = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, logout, current, updateAvatar };
+module.exports = {
+  register,
+  login,
+  logout,
+  current,
+  updateAvatar,
+  verifyEmail,
+};

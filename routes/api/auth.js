@@ -12,6 +12,7 @@ const { validateBody } = require("../../middlewares/index");
 const {
   userRegisterSchema,
   userLoginSchema,
+  emailSchema,
 } = require("../../contactsSchemas/auth");
 
 router.post(
@@ -36,6 +37,13 @@ router.patch(
   AuthMiddleware,
   uploadMiddleware.single("avatar"),
   AuthController.updateAvatar
+);
+
+router.get("/verify/:verifyToken", AuthController.verifyEmail);
+router.post(
+  "/verify",
+  validateBody(emailSchema),
+  AuthController.resendVerifyEmail
 );
 
 module.exports = router;
