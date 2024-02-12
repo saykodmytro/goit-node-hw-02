@@ -21,19 +21,19 @@ async function register(req, res, next) {
     }
     const passHash = await bcrypt.hash(password, 10);
     const avatarURL = gravatar.url(email);
-    const verifyToken = crypto.randomUUID();
+    const verificationToken = crypto.randomUUID();
 
     const newUser = await User.create({
       ...req.body,
       password: passHash,
       avatarURL,
-      verifyToken,
+      verificationToken,
     });
 
     const verifyEmail = {
       to: email,
       subject: "Verify email",
-      html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verifyToken}">Click verify email</a>`,
+      html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click verify email</a>`,
     };
 
     await sendEmail(verifyEmail);
@@ -45,6 +45,50 @@ async function register(req, res, next) {
     next(error);
   }
 }
+
+const verifyEmail = async (req, res, next) => {
+  try {
+    const { verificationToken } = req.params;
+    const user = await User.findOne({ verificationToken: verificationToken });
+    if (user === null) {
+      throw HttpError(404, "User not found");
+    }
+    await User.findByIdAndUpdate(user._id, {
+      verify: true,
+      verificationToken: null,
+    });
+    res.json({
+      message: "Verification successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resendVerifyEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (user === null) {
+      throw HttpError(400, "missing required field email");
+    }
+
+    if (user.verify) {
+      throw HttpError(400, "Verification has already been passed");
+    }
+    const verifyEmail = {
+      to: email,
+      subject: "Verify email",
+      html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click verify email</a>`,
+    };
+
+    await sendEmail(verifyEmail);
+
+    res.json({ message: "Verification email sent" });
+  } catch (error) {
+    next(error);
+  }
+};
 
 async function login(req, res, next) {
   const { email, password } = req.body;
@@ -61,6 +105,10 @@ async function login(req, res, next) {
       return res.status(401).send({ message: "Email or password is wrong" });
     }
 
+    if (user.verify === false) {
+      throw HttpError(401, "Email is not verified");
+    }
+
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
@@ -74,7 +122,9 @@ async function login(req, res, next) {
         subscription: user.subscription,
       },
     });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function logout(req, res, next) {
@@ -118,4 +168,5 @@ module.exports = {
   current,
   updateAvatar,
   verifyEmail,
+  resendVerifyEmail,
 };

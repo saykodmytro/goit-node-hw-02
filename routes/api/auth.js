@@ -39,7 +39,8 @@ router.patch(
   AuthController.updateAvatar
 );
 
-router.get("/verify/:verifyToken", AuthController.verifyEmail);
+router.get("/verify/:verificationToken", AuthController.verifyEmail);
+
 router.post(
   "/verify",
   validateBody(emailSchema),
